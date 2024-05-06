@@ -20,7 +20,6 @@ class SudokuSolver:
             cls._instance = super().__new__(cls)
         return cls._instance
 
-        
 
     @classmethod
     def get_instance(cls, root):
