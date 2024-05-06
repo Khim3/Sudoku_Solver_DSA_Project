@@ -70,10 +70,20 @@ class SudokuSolver:
         self.clearButton.place(x=800, y=5)
 
     def solve(self):
-        print('Solving...')
+        if self.selected_difficulty.get() != 'Custom':
+            # Read the Sudoku problem from a file
+            with open(f'{self.selected_difficulty.get()}.txt', 'r') as f:
+                problem = [list(map(int, line.strip())) for line in f]
+        else:
+            # Get the Sudoku problem from the grid
+            problem = [[int(self.cells[i][j].get()) if self.cells[i][j].get(
+            ) != '' else 0 for j in range(9)] for i in range(9)]
+        
 
     def clear(self):
-        print('Clearing...')
+        for i in range(9):
+            for j in range(9):
+                self.cells[i][j].delete(0, 'end')
 
 
 if __name__ == "__main__":
