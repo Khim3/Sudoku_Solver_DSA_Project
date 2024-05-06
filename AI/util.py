@@ -1,7 +1,6 @@
 import inspect
 import sys
 
-
 digits = cols = "123456789"
 rows = "ABCDEFGHI"
 
