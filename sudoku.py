@@ -5,6 +5,7 @@ from random import randint
 import random
 import time
 
+
 class SudokuSolver:
     _instance = None
 
@@ -14,7 +15,7 @@ class SudokuSolver:
         self.root.geometry('1280x720')
         self.root.config(bg='gray')
         self.create_widgets()
-        
+
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
             cls._instance = super().__new__(cls)
@@ -25,27 +26,55 @@ class SudokuSolver:
         if not cls._instance:
             cls._instance = cls(root)
         return cls._instance
+
     def create_widgets(self):
+        # Sudoku grid
+        self.grid_frame = Frame(self.root)
+        self.grid_frame.place(x=50, y=100)
+
+        self.cells = []
+        for i in range(9):
+            row = []
+            for j in range(9):
+                entry = Entry(self.grid_frame, width=5, font=(
+                    'Fira Code', 20), justify='center')
+                entry.grid(row=i, column=j)
+                row.append(entry)
+            self.cells.append(row)
         # Algorithm selection
         self.selected_algorithm = StringVar()
         self.algoLabel = Label(self.root, text='Algorithm: ', font=(
-            'Segoe UI', 15, 'italic'), bg='green', width=10, fg='black', relief=GROOVE, bd=5)
+            'Fira Code', 15, 'italic'), bg='green', width=12, fg='black', relief=GROOVE, bd=5)
         self.algoLabel.place(x=1, y=5)
 
-        self.algoMenu = ttk.Combobox(self.root, height=10, width=15, font=('Segoe UI', 15, 'bold'), textvariable=self.selected_algorithm,
+        self.algoMenu = ttk.Combobox(self.root, height=10, width=20, font=('Fira Code', 15, 'bold'), textvariable=self.selected_algorithm,
                                      values=['Backtracking', 'AC-3', 'Constraint'])
-        self.algoMenu.place(x=125, y=8)
+        self.algoMenu.place(x=160, y=8)
         self.algoMenu.current(0)
         # Difficulty selection
         self.selected_difficulty = StringVar()
         self.difficultyLabel = Label(self.root, text='Difficulty: ', font=(
-            'Segoe UI', 15, 'italic'), bg='green', width=10, fg='black', relief=GROOVE, bd=5)
-        self.difficultyLabel.place(x=250, y=5)
-        self.difficultyMenu = ttk.Combobox(self.root, height=10, width=15, font=('Segoe UI', 15, 'bold'), textvariable=self.selected_difficulty,
+            'Fira Code', 15, 'italic'), bg='green', width=10, fg='black', relief=GROOVE, bd=5)
+        self.difficultyLabel.place(x=300, y=5)
+        self.difficultyMenu = ttk.Combobox(self.root, height=10, width=15, font=('Fira Code', 15, 'bold'), textvariable=self.selected_difficulty,
                                            values=['Easy', 'Medium', 'Hard'])
-        self.difficultyMenu.place(x=375, y=8)
-        self.algoMenu.current(0)
-        
+        self.difficultyMenu.place(x=500, y=8)
+        self.difficultyMenu.current(0)
+        # Solve button
+        self.solveButton = Button(self.root, text='Solve', font=(
+            'Fira Code', 15, 'bold'), bg='green', fg='black', relief=GROOVE, bd=5, command=self.solve)
+        self.solveButton.place(x=700, y=5)
+        # Clear button
+        self.clearButton = Button(self.root, text='Clear', font=(
+            'Fira Code', 15, 'bold'), bg='green', fg='black', relief=GROOVE, bd=5, command=self.clear)
+        self.clearButton.place(x=800, y=5)
+
+    def solve(self):
+        print('Solving...')
+
+    def clear(self):
+        print('Clearing...')
+
 
 if __name__ == "__main__":
     root = Tk()
