@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import *
 from tkinter import ttk
 from random import randint
+from search import Backtracking, AC3
 import random
 import time
 
