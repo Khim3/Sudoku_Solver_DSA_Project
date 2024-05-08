@@ -73,7 +73,7 @@ class SudokuSolver:
     def solve(self):
         if self.selected_difficulty.get() != 'Custom':
             # Read the Sudoku problem from a file
-            with open(f'{self.selected_difficulty.get()}.txt', 'r') as f:
+            with open(f'input/{self.selected_difficulty.get()}.txt', 'r') as f:
                 problem = [list(map(int, line.strip())) for line in f]
         else:
             # Get the Sudoku problem from the grid
