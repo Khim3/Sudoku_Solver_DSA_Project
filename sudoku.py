@@ -49,19 +49,19 @@ class SudokuSolver:
         self.algoLabel.place(x=1, y=5)
 
         self.algoMenu = ttk.Combobox(self.root, height=10, width=15, font=('Fira Code', 15, 'bold'), textvariable=self.selected_algorithm,
-                                     values=['Backtracking', 'AC-3', 'Forward Checking', 'Hidden Single'])
+                                     values=['Backtracking', 'AC-3', 'Hidden Single'])
         self.algoMenu.place(x=160, y=8)
         self.algoMenu.current(0)
         # Difficulty selection
         self.selected_difficulty = StringVar()
         self.difficultyLabel = Label(self.root, text='Difficulty: ', font=(
-            'Fira Code', 15, 'italic'), bg='green', width=10, fg='black', relief=GROOVE, bd=5)
-        self.difficultyLabel.place(x=400, y=5)
-        self.difficultyMenu = ttk.Combobox(self.root, height=10, width=15, font=('Fira Code', 15, 'bold'), textvariable=self.selected_difficulty,
+            'Fira Code', 15, 'italic'), bg='green', width=11, fg='black', relief=GROOVE, bd=5)
+        self.difficultyLabel.place(x=370, y=5)
+        self.difficultyMenu = ttk.Combobox(self.root, height=10, width=12, font=('Fira Code', 15, 'bold'), textvariable=self.selected_difficulty,
                                            values=['Easy', 'Medium', 'Hard', 'Custom'])
-        self.difficultyMenu.place(x=500, y=8)
+        self.difficultyMenu.place(x=515, y=8)
         self.difficultyMenu.current(0)
-        
+
         # Solve button
         self.solveButton = Button(self.root, text='Solve', font=(
             'Fira Code', 15, 'bold'), bg='green', fg='black', relief=GROOVE, bd=5, command=self.solve)
