@@ -2,7 +2,8 @@ import tkinter as tk
 from tkinter import *
 from tkinter import ttk
 from random import randint
-from search import Backtracking, AC3
+from search import *
+from csp import *
 import random
 import time
 
@@ -72,14 +73,31 @@ class SudokuSolver:
         self.clearButton.place(x=800, y=5)
 
     def solve(self):
-        if self.selected_difficulty.get() != 'Custom':
-            # Read the Sudoku problem from a file
-            with open(f'input/{self.selected_difficulty.get()}.txt', 'r') as f:
-                problem = [list(map(int, line.strip())) for line in f]
-        else:
-            # Get the Sudoku problem from the grid
-            problem = [[int(self.cells[i][j].get()) if self.cells[i][j].get(
-            ) != '' else 0 for j in range(9)] for i in range(9)]
+        array = []
+        # Open the input file and read the problems
+        with open(f'input/{self.selected_difficulty.get()}.txt', 'r') as ins:
+            for line in ins:
+                array.append(line)
+        ins.close()
+
+        # Open the output file
+        f = open('output.txt', 'w')
+            # Solve each problem
+        for grid in array:
+            # Create a CSP object
+            csp_instance = csp(grid=grid)
+
+            # Solve the problem using the selected algorithm
+            if self.selected_algorithm.get() == 'Backtracking':
+                solver = Backtracking()
+                solution = solver.Backtracking_Search(csp_instance)
+            # If a solution was found, write it to the output file
+            if solution is not None:
+                f.write(''.join(str(cell) for row in solution for cell in row) + '\n')
+            else:
+                f.write('No solution found.\n')
+
+
 
     def clear(self):
         for i in range(9):

@@ -1,11 +1,12 @@
-
-from search import *
-import time
+import sys #For getting the values from command line 
+import time 
+from csp import csp
+from AC3 import *
 import argparse
 
 #THE MAIN FUNCTION GOES HERE
 if __name__ == "__main__":
-
+   
     argument_parser = argparse.ArgumentParser(description="Sudoku Solving Problem")
     argument_parser.add_argument("--inputFile", type=str, help="Sudoku Input File")
     args = argument_parser.parse_args()
@@ -16,22 +17,21 @@ if __name__ == "__main__":
         for line in ins:
             array.append(line)
     ins.close()
+    start = time.time()
     i = 0
     boardno = 0
     start = time.time()
-    f = open("output.txt", "w")
     for grid in array:
-        startpuzle = time.time()
-        boardno = boardno + 1
+        prev = time.time()
         sudoku = csp(grid=grid)
-        solved = Backtracking_Search(sudoku)
-        print("The board - ", boardno, " takes ", time.time() - startpuzle, " seconds")
-        if solved != "FAILURE":
-            print("After solving: ")
-            display(solved)
-            f.write(write(solved)+"\n")
+        solved  = AC3(sudoku) 
+        boardno = boardno + 1 
+        if isComplete(sudoku) and solved: 
+            print (boardno)
+            print ("Before solving: ", grid)
+            print ("After solving: ", write(sudoku.values))
+            print ("Running time: ", time.time()-prev, "\n")
             i = i + 1
 
-    f.close()
     print ("Number of problems solved is: ", i)
-    print ("Time taken to solve the puzzles is: ", time.time() - start)
+    print ("The complete run time is: ", time.time()-start)
