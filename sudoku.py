@@ -3,6 +3,7 @@ from tkinter import *
 from tkinter import ttk
 from random import randint
 from search import *
+from Backtrack import *
 from csp import *
 import random
 import time
@@ -90,12 +91,11 @@ class SudokuSolver:
                 if self.selected_algorithm.get() == 'Backtracking':
                     solver = BacktrackingSolver(csp_instance)
                     solution = solver.Backtracking_Search(csp_instance)
-                    formatted_solution = ''.join(solution[cell] for cell in squares)
-                # Write the solution to the output file
-                    f.write(formatted_solution + '\n')
+                    f.write(solver.write(solution) + '\n')
                 if self.selected_algorithm.get() == 'AC-3':
-                    solver = AC3()
-                    solution = solver.AC3(csp_instance)
+                    solver = AC3(csp_instance)
+                   ##   f.write(write(sudoku.values)+"\n")
+                  #  i = i + 1
                 if self.selected_algorithm.get() == 'Hidden Single':
                     solver = HiddenSingle()
                     solution = solver.Hidden_Single(csp_instance)
