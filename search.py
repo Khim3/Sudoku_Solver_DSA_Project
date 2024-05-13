@@ -7,11 +7,12 @@ import queue
 from copy import deepcopy
 
 class BacktrackingSolver:
-    #def __init__(self, csp):
-     #   self.csp = csp
-      #  self.assignment = {}
+    def __init__(self, csp):
+        self.csp = csp
+        self.assignment = {}
 
-    def Backtracking_Search(self):
+    def Backtracking_Search(self, csp_instance):
+        self.csp = csp_instance
         return self.Recursive_Backtracking()
 
     def Recursive_Backtracking(self):

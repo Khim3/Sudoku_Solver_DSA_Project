@@ -81,23 +81,29 @@ class SudokuSolver:
         ins.close()
 
         # Open the output file
-        f = open('output.txt', 'w')
+        with open('output.txt', 'w') as f:
             # Solve each problem
-        for grid in array:
-            # Create a CSP object
-            csp_instance = csp(grid=grid)
-
-            # Solve the problem using the selected algorithm
-            if self.selected_algorithm.get() == 'Backtracking':
-                solver = Backtracking()
-                solution = solver.Backtracking_Search(csp_instance)
-            # If a solution was found, write it to the output file
-            if solution is not None:
-                f.write(''.join(str(cell) for row in solution for cell in row) + '\n')
-            else:
-                f.write('No solution found.\n')
-
-
+            for grid in array:
+                # Create a CSP object
+                csp_instance = csp(grid=grid)
+                # Solve the problem using the selected algorithm
+                if self.selected_algorithm.get() == 'Backtracking':
+                    solver = BacktrackingSolver(csp_instance)
+                    solution = solver.Backtracking_Search(csp_instance)
+                    formatted_solution = ''.join(solution[cell] for cell in squares)
+                # Write the solution to the output file
+                    f.write(formatted_solution + '\n')
+                if self.selected_algorithm.get() == 'AC-3':
+                    solver = AC3()
+                    solution = solver.AC3(csp_instance)
+                if self.selected_algorithm.get() == 'Hidden Single':
+                    solver = HiddenSingle()
+                    solution = solver.Hidden_Single(csp_instance)
+                # If a solution was found, write it to the output file
+                if solution is not None:
+                    f.write(''.join(str(cell) for row in solution for cell in row) + '\n')
+                else:
+                    f.write('No solution found.\n')
 
     def clear(self):
         for i in range(9):
