@@ -4,6 +4,7 @@ from tkinter import ttk
 from random import randint
 from search import *
 from Backtrack import *
+from AC3 import *
 from csp import *
 import random
 import time
@@ -53,7 +54,7 @@ class SudokuSolver:
         self.algoMenu = ttk.Combobox(self.root, height=10, width=15, font=('Fira Code', 15, 'bold'), textvariable=self.selected_algorithm,
                                      values=['Backtracking', 'AC-3', 'Hidden Single'])
         self.algoMenu.place(x=160, y=8)
-        self.algoMenu.current(0)
+        self.algoMenu.current(1)
         # Difficulty selection
         self.selected_difficulty = StringVar()
         self.difficultyLabel = Label(self.root, text='Difficulty: ', font=(
@@ -85,6 +86,7 @@ class SudokuSolver:
         with open('output.txt', 'w') as f:
             # Solve each problem
             for grid in array:
+                solution = None
                 # Create a CSP object
                 csp_instance = csp(grid=grid)
                 # Solve the problem using the selected algorithm
@@ -94,16 +96,21 @@ class SudokuSolver:
                     f.write(solver.write(solution) + '\n')
                 if self.selected_algorithm.get() == 'AC-3':
                     solver = AC3(csp_instance)
-                   ##   f.write(write(sudoku.values)+"\n")
+                    if solver.isComplete() and solver.AC3():
+
+                        f.write(solver.write(csp_instance.values)+"\n")
+
+                   # f.write(write(sudoku.values)+"\n")
                   #  i = i + 1
                 if self.selected_algorithm.get() == 'Hidden Single':
                     solver = HiddenSingle()
                     solution = solver.Hidden_Single(csp_instance)
                 # If a solution was found, write it to the output file
                 if solution is not None:
-                    f.write(''.join(str(cell) for row in solution for cell in row) + '\n')
+                    f.write(''.join(str(cell)
+                            for row in solution for cell in row) + '\n')
                 else:
-                    f.write('No solution found.\n')
+                    f.write('No solution found for this problem.\n')
 
     def clear(self):
         for i in range(9):
