@@ -4,8 +4,8 @@ from tkinter import ttk
 from random import randint
 from Backtrack import *
 from AC3 import *
+from HiddenSingle import *
 from csp import *
-import random
 import time
 
 
@@ -86,24 +86,23 @@ class SudokuSolver:
             for grid in array:
                 solution = None
                 # Create a CSP object
-                csp_instance = csp(grid=grid)
+                sudoku = csp(grid=grid)
                 # Solve the problem using the selected algorithm
                 if self.selected_algorithm.get() == 'Backtracking':
-                    solver = BacktrackingSolver(csp_instance)
-                    solution = solver.Backtracking_Search(csp_instance)
+                    solver = BacktrackingSolver(sudoku)
+                    solution = solver.Backtracking_Search(sudoku)
                     f.write(solver.write(solution) + '\n')
                 if self.selected_algorithm.get() == 'AC-3':
-                    solver = AC3(csp_instance)
-                    if solver.isComplete() and solver.AC3():
-                        f.write(solver.write(csp_instance.values)+"\n")
+                    solver = AC3Solver(sudoku)
+                    solved = solver.AC3()
+                    if solved and solver.isComplete():
+                        solution = sudoku.values   
+                        f.write(solver.write(solution) + '\n')
                 if self.selected_algorithm.get() == 'Hidden Single':
                     solver = HiddenSingle()
-                    solution = solver.Hidden_Single(csp_instance)
+                    solution = solver.Hidden_Single(sudoku)
                 # If a solution was found, write it to the output file
-                if solution is not None:
-                    f.write(''.join(str(cell)
-                            for row in solution for cell in row) + '\n')
-                else:
+                if solution is  None:                
                     f.write('No solution found for this problem.\n')
 
     def clear(self):

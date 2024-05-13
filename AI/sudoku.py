@@ -43,8 +43,6 @@ if __name__ == "__main__":
                 solved = AC3(sudoku)
                 print("The board - ", boardno, " takes ", time.time() - startpuzle, " seconds")
                 if isComplete(sudoku) and solved:
-                    print("After solving: ")
-                    display(sudoku.values)
                     f.write(write(sudoku.values)+"\n")
                     i = i + 1
                 else: print("Unable to solve!")

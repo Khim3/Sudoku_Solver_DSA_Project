@@ -2,21 +2,20 @@ from csp import *
 from copy import deepcopy
 import util
 import queue
-from copy import deepcopy
 
 
-class AC3:
+
+class AC3Solver:
     def __init__(self, csp):
         self.csp = csp
 
     def AC3(self):
         q = queue.Queue()
-        for arc in self.csp.constraints:
-            q.put(arc)
-        i = 0
+        for Xi in self.csp.variables:
+            for Xj in self.csp.peers[Xi]:
+                q.put((Xi, Xj))
         while not q.empty():
             (Xi, Xj) = q.get()
-            i = i + 1
             if self.Revise(Xi, Xj):
                 if len(self.csp.values[Xi]) == 0:
                     return False
@@ -27,7 +26,7 @@ class AC3:
     def Revise(self, Xi, Xj):
         revised = False
         values = set(self.csp.values[Xi])
-        for x in values:
+        for x in values: 
             if not self.isConsistent(x, Xi, Xj):
                 self.csp.values[Xi] = self.csp.values[Xi].replace(x, '')
                 revised = True
@@ -35,13 +34,13 @@ class AC3:
 
     def isConsistent(self, x, Xi, Xj):
         for y in self.csp.values[Xj]:
-            if Xj in self.csp.peers[Xi] and y != x:
+            if Xj in self.csp.peers[Xi] and y!=x:
                 return True
         return False
 
     def isComplete(self):
         for variable in squares:
-            if len(self.csp.values[variable]) > 1:
+            if len(self.csp.values[variable])>1:
                 return False
         return True
 
