@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import *
 from tkinter import ttk
 from random import randint
-from search import *
 from Backtrack import *
 from AC3 import *
 from csp import *
@@ -81,7 +80,6 @@ class SudokuSolver:
             for line in ins:
                 array.append(line)
         ins.close()
-
         # Open the output file
         with open('output.txt', 'w') as f:
             # Solve each problem
@@ -97,11 +95,7 @@ class SudokuSolver:
                 if self.selected_algorithm.get() == 'AC-3':
                     solver = AC3(csp_instance)
                     if solver.isComplete() and solver.AC3():
-
                         f.write(solver.write(csp_instance.values)+"\n")
-
-                   # f.write(write(sudoku.values)+"\n")
-                  #  i = i + 1
                 if self.selected_algorithm.get() == 'Hidden Single':
                     solver = HiddenSingle()
                     solution = solver.Hidden_Single(csp_instance)
