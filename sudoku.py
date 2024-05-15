@@ -5,7 +5,7 @@ from tkinter import ttk
 from random import randint
 from Backtrack import *
 from AC3 import *
-from HiddenSingle import *
+from NakedSingle import *
 from csp import *
 import time
 
@@ -58,9 +58,9 @@ class SudokuSolver:
         self.algoLabel.place(x=1, y=5)
 
         self.algoMenu = ttk.Combobox(self.root, height=10, width=15, font=('Fira Code', 15, 'bold'), textvariable=self.selected_algorithm,
-                                     values=['Backtracking', 'AC-3', 'Hidden Single'])
+                                     values=['Backtracking', 'AC-3', 'Naked Single'])
         self.algoMenu.place(x=160, y=8)
-        self.algoMenu.current(0)
+        self.algoMenu.current(2)
         # Difficulty selection
         self.selected_difficulty = StringVar()
         self.difficultyLabel = Label(self.root, text='Difficulty: ', font=(
@@ -83,6 +83,7 @@ class SudokuSolver:
         self.validateButton = Button(self.root, text='Validate', font=(
             'Fira Code', 15, 'bold'), bg='green', fg='black', relief=GROOVE, bd=5, command=self.validate)
         self.validateButton.place(x=900, y=5)
+
     def validate(self):
         sudoku_grid = ''
         invalid_input = False
@@ -99,7 +100,8 @@ class SudokuSolver:
             if invalid_input:
                 break
         if invalid_input:
-            messagebox.showerror('Invalid Input', 'Please enter valid digits only.')    
+            messagebox.showerror(
+                'Invalid Input', 'Please enter valid digits only.')
         else:
             sudoku = csp(grid=sudoku_grid)
             # Check if any constraints are violated
@@ -108,11 +110,13 @@ class SudokuSolver:
                     d_val = sudoku.values[var]
                     for d2 in sudoku.peers[var]:
                         if sudoku.values[d2] == d_val:
-                            messagebox.showerror("Invalid Input", "The Sudoku grid violates some constraints.")
+                            messagebox.showerror(
+                                "Invalid Input", "The Sudoku grid violates some constraints.")
                             return
             # If no constraints are violated, write the Sudoku grid string to a file
             with open('input/Custom.txt', 'w') as f:
                 f.write(sudoku_grid)
+
     def solve(self):
         array = []
         with open(f'input/{self.selected_difficulty.get()}.txt', 'r') as ins:
@@ -136,9 +140,10 @@ class SudokuSolver:
                     if solved and solver.isComplete():
                         solution = sudoku.values
                         f.write(solver.write(solution) + '\n')
-                if self.selected_algorithm.get() == 'Hidden Single':
-                    solver = HiddenSingle()
-                    solution = solver.Hidden_Single(sudoku)
+                if self.selected_algorithm.get() == 'Naked Single':
+                    solver = NakedSingleSolver(sudoku)
+                    solution = solver.solve()
+                    f.write(solver.write(solution) + '\n')
                 if solution is None:
                     f.write('No solution found for this problem.\n')
 

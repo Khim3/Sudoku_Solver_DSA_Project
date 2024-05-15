@@ -29,4 +29,3 @@ class HiddenSingle:
         for variable in squares:
             output = output + values[variable]
         return output
-    
