@@ -31,6 +31,12 @@ class SudokuSolver:
         return cls._instance
 
     def create_widgets(self):
+        def validate_input(P):
+            if P.isdigit() and len(P) <= 1 or P == '':  # allow only digits and limit length to 1
+                return True
+            else:
+                return False
+        vcmd = (self.root.register(validate_input), '%P')
         # Sudoku grid
         self.grid_frame = Frame(self.root)
         self.grid_frame.place(x=50, y=100)
@@ -40,7 +46,7 @@ class SudokuSolver:
             row = []
             for j in range(9):
                 entry = Entry(self.grid_frame, width=5, font=(
-                    'Fira Code', 20), justify='center')
+                    'Fira Code', 20), justify='center', validate='key', validatecommand=vcmd)
                 entry.grid(row=i, column=j)
                 row.append(entry)
             self.cells.append(row)
@@ -96,13 +102,13 @@ class SudokuSolver:
                     solver = AC3Solver(sudoku)
                     solved = solver.AC3()
                     if solved and solver.isComplete():
-                        solution = sudoku.values   
+                        solution = sudoku.values
                         f.write(solver.write(solution) + '\n')
                 if self.selected_algorithm.get() == 'Hidden Single':
                     solver = HiddenSingle()
                     solution = solver.Hidden_Single(sudoku)
                 # If a solution was found, write it to the output file
-                if solution is  None:                
+                if solution is None:
                     f.write('No solution found for this problem.\n')
 
     def clear(self):
