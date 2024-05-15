@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox
 from tkinter import *
 from tkinter import ttk
 from random import randint
@@ -59,7 +60,7 @@ class SudokuSolver:
         self.algoMenu = ttk.Combobox(self.root, height=10, width=15, font=('Fira Code', 15, 'bold'), textvariable=self.selected_algorithm,
                                      values=['Backtracking', 'AC-3', 'Hidden Single'])
         self.algoMenu.place(x=160, y=8)
-        self.algoMenu.current(1)
+        self.algoMenu.current(0)
         # Difficulty selection
         self.selected_difficulty = StringVar()
         self.difficultyLabel = Label(self.root, text='Difficulty: ', font=(
@@ -78,7 +79,40 @@ class SudokuSolver:
         self.clearButton = Button(self.root, text='Clear', font=(
             'Fira Code', 15, 'bold'), bg='green', fg='black', relief=GROOVE, bd=5, command=self.clear)
         self.clearButton.place(x=800, y=5)
-
+        # validate button
+        self.validateButton = Button(self.root, text='Validate', font=(
+            'Fira Code', 15, 'bold'), bg='green', fg='black', relief=GROOVE, bd=5, command=self.validate)
+        self.validateButton.place(x=900, y=5)
+    def validate(self):
+        sudoku_grid = ''
+        invalid_input = False
+        for i in range(9):
+            for j in range(9):
+                cell_value = self.cells[i][j].get()
+                if cell_value == '':
+                    sudoku_grid += '0'
+                elif cell_value.isdigit():
+                    sudoku_grid += cell_value
+                else:
+                    invalid_input = True
+                    break
+            if invalid_input:
+                break
+        if invalid_input:
+            messagebox.showerror('Invalid Input', 'Please enter valid digits only.')    
+        else:
+            sudoku = csp(grid=sudoku_grid)
+            # Check if any constraints are violated
+            for var in sudoku.variables:
+                if len(sudoku.values[var]) == 1:
+                    d_val = sudoku.values[var]
+                    for d2 in sudoku.peers[var]:
+                        if sudoku.values[d2] == d_val:
+                            messagebox.showerror("Invalid Input", "The Sudoku grid violates some constraints.")
+                            return
+            # If no constraints are violated, write the Sudoku grid string to a file
+            with open('Custom_output.txt', 'w') as f:
+                f.write(sudoku_grid)
     def solve(self):
         array = []
         # Open the input file and read the problems
