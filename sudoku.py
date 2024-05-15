@@ -111,17 +111,15 @@ class SudokuSolver:
                             messagebox.showerror("Invalid Input", "The Sudoku grid violates some constraints.")
                             return
             # If no constraints are violated, write the Sudoku grid string to a file
-            with open('Custom_output.txt', 'w') as f:
+            with open('input/Custom.txt', 'w') as f:
                 f.write(sudoku_grid)
     def solve(self):
         array = []
-        # Open the input file and read the problems
         with open(f'input/{self.selected_difficulty.get()}.txt', 'r') as ins:
             for line in ins:
                 array.append(line)
         ins.close()
-        # Open the output file
-        with open('output.txt', 'w') as f:
+        with open(f'output/{self.selected_difficulty.get()}_output.txt', 'w') as f:
             # Solve each problem
             for grid in array:
                 solution = None
@@ -141,7 +139,6 @@ class SudokuSolver:
                 if self.selected_algorithm.get() == 'Hidden Single':
                     solver = HiddenSingle()
                     solution = solver.Hidden_Single(sudoku)
-                # If a solution was found, write it to the output file
                 if solution is None:
                     f.write('No solution found for this problem.\n')
 
