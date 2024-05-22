@@ -178,10 +178,7 @@ class SudokuSolver:
                             f.write('No solution found for this problem.\n')
                     else:
                         f.write('No solution found for this problem.\n')
-                else:
-                    # Handle the case when the selected algorithm is not 'DLX'
-                    # You might want to raise an error or provide a default behavior
-                    f.write('No solution found for this problem.\n')
+              
                    
                 if solution is None:
                     f.write('No solution found for this problem\n')
