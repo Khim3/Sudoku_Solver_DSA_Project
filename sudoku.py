@@ -5,7 +5,8 @@ from tkinter import ttk
 from random import randint
 from Backtrack import *
 from AC3 import *
-from NakedSingle import *
+from DLX import *
+from DLXNode import DLXNode, DLXColumn
 from csp import *
 import time
 
@@ -58,7 +59,7 @@ class SudokuSolver:
         self.algoLabel.place(x=1, y=5)
 
         self.algoMenu = ttk.Combobox(self.root, height=10, width=15, font=('Fira Code', 15, 'bold'), textvariable=self.selected_algorithm,
-                                     values=['Backtracking', 'AC-3', 'Naked Single'])
+                                     values=['Backtracking', 'AC-3', 'DLX'])
         self.algoMenu.place(x=160, y=8)
         self.algoMenu.current(2)
         # Difficulty selection
@@ -116,20 +117,39 @@ class SudokuSolver:
             # If no constraints are violated, write the Sudoku grid string to a file
             with open('input/Custom.txt', 'w') as f:
                 f.write(sudoku_grid)
+                
+    def is_valid_sudoku(self, board):
+        def is_valid_unit(unit):
+            unit = [i for i in unit if i != '0']
+            return len(unit) == len(set(unit))
+
+        def get_unit(board, start, step):
+            return [board[i] for i in range(start, start + step * 9, step)]
+
+        for i in range(9):
+            # Check rows
+            if not is_valid_unit(board[i*9:(i+1)*9]):
+                return False
+            # Check columns
+            if not is_valid_unit(board[i::9]):
+                return False
+            # Check 3x3 subgrids
+            start = (i // 3) * 27 + (i % 3) * 3
+            if not is_valid_unit(get_unit(board, start, 1) + get_unit(board, start + 9, 1) + get_unit(board, start + 18, 1)):
+                return False
+
+        return True
 
     def solve(self):
         array = []
         with open(f'input/{self.selected_difficulty.get()}.txt', 'r') as ins:
             for line in ins:
-                array.append(line)
+                array.append(line.strip())
         ins.close()
         with open(f'output/{self.selected_difficulty.get()}_output.txt', 'w') as f:
-            # Solve each problem
             for grid in array:
                 solution = None
-                # Create a CSP object
                 sudoku = csp(grid=grid)
-                # Solve the problem using the selected algorithm
                 if self.selected_algorithm.get() == 'Backtracking':
                     solver = BacktrackingSolver(sudoku)
                     solution = solver.Backtracking_Search(sudoku)
@@ -140,17 +160,38 @@ class SudokuSolver:
                     if solved and solver.isComplete():
                         solution = sudoku.values
                         f.write(solver.write(solution) + '\n')
-                if self.selected_algorithm.get() == 'Naked Single':
-                    solver = NakedSingleSolver(sudoku)
-                    solution = solver.solve()
-                    f.write(solver.write(solution) + '\n')
-                if solution is None:
+                if self.selected_algorithm.get() == 'DLX':
+                    matrix = DLXSolver.sudoku_to_exact_cover(grid)
+                    dlx_solver = DLXSolver(matrix)
+                    solution = dlx_solver.solve()
+                    if solution is not None:
+                        solved_board = DLXSolver.exact_cover_to_sudoku(solution)
+                        # Ensure initial digits are respected
+                        solved_board = ''.join([
+                            solved_board[i] if grid[i] == '0' else grid[i]
+                            for i in range(81)
+                        ])
+                        # Validate the solution before writing
+                        if self.is_valid_sudoku(solved_board):
+                            f.write(solved_board + '\n')
+                        else:
+                            f.write('No solution found for this problem.\n')
+                    else:
+                        f.write('No solution found for this problem.\n')
+                else:
+                    # Handle the case when the selected algorithm is not 'DLX'
+                    # You might want to raise an error or provide a default behavior
                     f.write('No solution found for this problem.\n')
+                   
+                if solution is None:
+                    f.write('No solution found for this problem\n')
+
 
     def clear(self):
         for i in range(9):
             for j in range(9):
                 self.cells[i][j].delete(0, 'end')
+
 
 
 if __name__ == "__main__":
