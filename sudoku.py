@@ -5,9 +5,8 @@ from tkinter import ttk
 from random import randint
 from Backtrack import *
 from AC3 import *
-from DLX import *
-from DLXNode import DLXNode, DLXColumn
 from csp import *
+from HiddenSingle import *
 import time
 
 
@@ -117,28 +116,7 @@ class SudokuSolver:
             # If no constraints are violated, write the Sudoku grid string to a file
             with open('input/Custom.txt', 'w') as f:
                 f.write(sudoku_grid)
-                
-    def is_valid_sudoku(self, board):
-        def is_valid_unit(unit):
-            unit = [i for i in unit if i != '0']
-            return len(unit) == len(set(unit))
 
-        def get_unit(board, start, step):
-            return [board[i] for i in range(start, start + step * 9, step)]
-
-        for i in range(9):
-            # Check rows
-            if not is_valid_unit(board[i*9:(i+1)*9]):
-                return False
-            # Check columns
-            if not is_valid_unit(board[i::9]):
-                return False
-            # Check 3x3 subgrids
-            start = (i // 3) * 27 + (i % 3) * 3
-            if not is_valid_unit(get_unit(board, start, 1) + get_unit(board, start + 9, 1) + get_unit(board, start + 18, 1)):
-                return False
-
-        return True
 
     def solve(self):
         array = []
@@ -160,35 +138,15 @@ class SudokuSolver:
                     if solved and solver.isComplete():
                         solution = sudoku.values
                         f.write(solver.write(solution) + '\n')
-                if self.selected_algorithm.get() == 'DLX':
-                    matrix = DLXSolver.sudoku_to_exact_cover(grid)
-                    dlx_solver = DLXSolver(matrix)
-                    solution = dlx_solver.solve()
-                    if solution is not None:
-                        solved_board = DLXSolver.exact_cover_to_sudoku(solution)
-                        # Ensure initial digits are respected
-                        solved_board = ''.join([
-                            solved_board[i] if grid[i] == '0' else grid[i]
-                            for i in range(81)
-                        ])
-                        # Validate the solution before writing
-                        if self.is_valid_sudoku(solved_board):
-                            f.write(solved_board + '\n')
-                        else:
-                            f.write('No solution found for this problem.\n')
-                    else:
-                        f.write('No solution found for this problem.\n')
-              
-                   
+                if self.selected_algorithm.get() == 'Hidden Single':
+                    pass
                 if solution is None:
                     f.write('No solution found for this problem\n')
-
 
     def clear(self):
         for i in range(9):
             for j in range(9):
                 self.cells[i][j].delete(0, 'end')
-
 
 
 if __name__ == "__main__":
