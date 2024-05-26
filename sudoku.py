@@ -8,6 +8,7 @@ from AC3 import *
 from csp import *
 from HiddenSingle import *
 import time
+import random
 
 
 class SudokuSolver:
@@ -58,16 +59,16 @@ class SudokuSolver:
         self.algoLabel.place(x=1, y=5)
 
         self.algoMenu = ttk.Combobox(self.root, height=10, width=15, font=('Fira Code', 15, 'bold'), textvariable=self.selected_algorithm,
-                                     values=['Backtracking', 'AC-3', 'DLX'])
+                                     values=['Backtracking', 'AC-3', 'Hidden Single'])
         self.algoMenu.place(x=160, y=8)
-        self.algoMenu.current(2)
+        self.algoMenu.current(0)
         # Difficulty selection
         self.selected_difficulty = StringVar()
         self.difficultyLabel = Label(self.root, text='Difficulty: ', font=(
             'Fira Code', 15, 'italic'), bg='green', width=11, fg='black', relief=GROOVE, bd=5)
         self.difficultyLabel.place(x=370, y=5)
         self.difficultyMenu = ttk.Combobox(self.root, height=10, width=12, font=('Fira Code', 15, 'bold'), textvariable=self.selected_difficulty,
-                                           values=['Easy', 'Medium', 'Hard', 'Custom'])
+                                           values=['Problem1', 'Problem2', 'Problem3', 'Easy', 'Medium', 'Hard', 'Custom'])
         self.difficultyMenu.place(x=515, y=8)
         self.difficultyMenu.current(0)
 
@@ -83,6 +84,10 @@ class SudokuSolver:
         self.validateButton = Button(self.root, text='Validate', font=(
             'Fira Code', 15, 'bold'), bg='green', fg='black', relief=GROOVE, bd=5, command=self.validate)
         self.validateButton.place(x=900, y=5)
+        # generate random button
+        self.generateButton = Button(self.root, text='Generate Random', font=(
+            'Fira Code', 15, 'bold'), bg='green', fg='black', relief=GROOVE, bd=5, command=self.generate_random)
+        self.generateButton.place(x=1000, y=5)
 
     def validate(self):
         sudoku_grid = ''
@@ -117,13 +122,28 @@ class SudokuSolver:
             with open('input/Custom.txt', 'w') as f:
                 f.write(sudoku_grid)
 
-
     def solve(self):
         array = []
-        with open(f'input/{self.selected_difficulty.get()}.txt', 'r') as ins:
-            for line in ins:
-                array.append(line.strip())
-        ins.close()
+        if self.selected_difficulty.get() == 'Custom':
+            # Read the grid from the GUI
+            grid = ''
+            for i in range(9):
+                for j in range(9):
+                    cell_value = self.cells[i][j].get()
+                    if cell_value == '':
+                        grid += '0'
+                    elif cell_value.isdigit():
+                        grid += cell_value
+                    else:
+                        messagebox.showerror(
+                            'Invalid Input', 'Please enter valid digits only.')
+                        return
+            array.append(grid)
+        if self.selected_difficulty.get() in ['Problem1', 'Problem2', 'Problem3', 'Easy', 'Medium', 'Hard']:
+            with open(f'input/{self.selected_difficulty.get()}.txt', 'r') as ins:
+                for line in ins:
+                    array.append(line.strip())
+            ins.close()
         with open(f'output/{self.selected_difficulty.get()}_output.txt', 'w') as f:
             for grid in array:
                 solution = None
@@ -132,16 +152,100 @@ class SudokuSolver:
                     solver = BacktrackingSolver(sudoku)
                     solution = solver.Backtracking_Search(sudoku)
                     f.write(solver.write(solution) + '\n')
-                if self.selected_algorithm.get() == 'AC-3':
+                elif self.selected_algorithm.get() == 'AC-3':
                     solver = AC3Solver(sudoku)
                     solved = solver.AC3()
                     if solved and solver.isComplete():
                         solution = sudoku.values
                         f.write(solver.write(solution) + '\n')
-                if self.selected_algorithm.get() == 'Hidden Single':
-                    pass
+                elif self.selected_algorithm.get() == 'Hidden Single':
+                    solver = HiddenSingleSolver(sudoku)
+                    solved = solver.Hidden_Single()
+                    if solved:
+                        solution = sudoku.values
+                        f.write(solver.write(solution) + '\n')
                 if solution is None:
                     f.write('No solution found for this problem\n')
+                    if  self.selected_difficulty.get() in ['Custom', 'Easy', 'Medium', 'Hard']:
+                        messagebox.showerror('No solution','No solution found for this problem')
+                else:
+                    f.write(solver.write(solution) + '\n')
+                # Fill the grid in the GUI with the solution
+                    for i in range(9):
+                        for j in range(9):
+                            self.cells[i][j].delete(0, 'end')
+                            self.cells[i][j].insert(
+                                0, solution[f'{chr(65+i)}{j+1}'])
+                            self.cells[i][j].config(fg='green')
+
+    def generate_random(self):
+        self.clear()
+        # Generate a complete Sudoku puzzle
+
+        def generate_complete_board():
+            board = [['0'] * 9 for _ in range(9)]
+
+            def is_valid(board, row, col, num):
+                for i in range(9):
+                    if board[row][i] == num or board[i][col] == num:
+                        return False
+                start_row, start_col = 3 * (row // 3), 3 * (col // 3)
+                for i in range(start_row, start_row + 3):
+                    for j in range(start_col, start_col + 3):
+                        if board[i][j] == num:
+                            return False
+                return True
+
+            def solve_board(board):
+                for row in range(9):
+                    for col in range(9):
+                        if board[row][col] == '0':
+                            nums = [str(n) for n in range(1, 10)]
+                            random.shuffle(nums)
+                            for num in nums:
+                                if is_valid(board, row, col, num):
+                                    board[row][col] = num
+                                    if solve_board(board):
+                                        return True
+                                    board[row][col] = '0'
+                            return False
+                return True
+
+            solve_board(board)
+            return board
+
+        # Remove digits to create the puzzle
+        def create_puzzle(board, num_holes):
+            holes = set()
+            while len(holes) < num_holes:
+                row, col = random.randint(0, 8), random.randint(0, 8)
+                if board[row][col] != '0':
+                    holes.add((row, col))
+                    board[row][col] = '0'
+            return board
+
+        complete_board = generate_complete_board()
+        difficulty = self.selected_difficulty.get()
+        if difficulty == 'Easy':
+            num_holes = 30
+        elif difficulty == 'Medium':
+            num_holes = 40
+        elif difficulty == 'Hard':
+            num_holes = 50
+
+        puzzle_board = create_puzzle(complete_board, num_holes)
+        puzzle_grid = ''.join(''.join(row) for row in puzzle_board)
+
+        # Save the generated puzzle to a file
+        with open(f'input/{difficulty}.txt', 'w') as f:
+            f.write(puzzle_grid)
+
+        # Display the puzzle in the GUI
+        for i in range(9):
+            for j in range(9):
+                if puzzle_board[i][j] != '0':
+                    self.cells[i][j].insert(0, puzzle_board[i][j])
+                    self.cells[i][j].config(fg='red')
 
     def clear(self):
         for i in range(9):

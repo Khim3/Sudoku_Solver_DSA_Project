@@ -4,8 +4,6 @@ import util
 import queue
 
 
-from copy import deepcopy
-
 class BacktrackingSolver:
     def __init__(self, csp):
         self.csp = csp
@@ -45,7 +43,8 @@ class BacktrackingSolver:
                 if len(self.csp.values[neighbor]) == 1:
                     return "FAILURE"
 
-                remaining = self.csp.values[neighbor] = self.csp.values[neighbor].replace(value, "")
+                remaining = self.csp.values[neighbor] = self.csp.values[neighbor].replace(
+                    value, "")
 
                 if len(remaining) == 1:
                     flag = self.Inference(inferences, neighbor, remaining)
@@ -55,7 +54,8 @@ class BacktrackingSolver:
         return inferences
 
     def Select_Unassigned_Variables(self):
-        unassigned_variables = dict((squares, len(self.csp.values[squares])) for squares in self.csp.values if squares not in self.assignment.keys())
+        unassigned_variables = dict((squares, len(
+            self.csp.values[squares])) for squares in self.csp.values if squares not in self.assignment.keys())
         mrv = min(unassigned_variables, key=unassigned_variables.get)
         return mrv
 
@@ -68,16 +68,16 @@ class BacktrackingSolver:
                 return False
         return True
 
-    def display(self, values):
-        for row in rows:
-            if row in 'DG':
-                print("-------------------------------------------")
-            for col in cols:
-                if col in '47':
-                    print(' | ', values[row + col], ' ', end=' ')
-                else:
-                    print(values[row + col], ' ', end=' ')
-            print(end='\n')
+    # def display(self, values):
+    #     for row in rows:
+    #         if row in 'DG':
+    #             print("-------------------------------------------")
+    #         for col in cols:
+    #             if col in '47':
+    #                 print(' | ', values[row + col], ' ', end=' ')
+    #             else:
+    #                 print(values[row + col], ' ', end=' ')
+    #         print(end='\n')
 
     def write(self, values):
         output = ""
