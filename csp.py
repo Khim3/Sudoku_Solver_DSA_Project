@@ -3,11 +3,8 @@ from util import *
 
 class csp:
     def __init__(self, domain=digits, grid=""):
-
         self.variables = cross(rows, cols)
-
         self.domain = {variable: domain for variable in self.variables}
-
         self.unitlist = ([cross(rows, c) for c in cols] +
                          [cross(r, cols) for r in rows] +
                          [cross(rs, cs) for rs in ('ABC', 'DEF', 'GHI') for cs in ('123', '456', '789')])

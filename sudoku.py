@@ -9,6 +9,7 @@ from csp import *
 from HiddenSingle import *
 import time
 import random
+import threading
 
 
 class SudokuSolver:
@@ -65,29 +66,38 @@ class SudokuSolver:
         # Difficulty selection
         self.selected_difficulty = StringVar()
         self.difficultyLabel = Label(self.root, text='Difficulty: ', font=(
-            'Fira Code', 15, 'italic'), bg='green', width=11, fg='black', relief=GROOVE, bd=5)
+            'Fira Code', 15, 'italic'), bg='green', width=12, fg='black', relief=GROOVE, bd=5)
         self.difficultyLabel.place(x=370, y=5)
         self.difficultyMenu = ttk.Combobox(self.root, height=10, width=12, font=('Fira Code', 15, 'bold'), textvariable=self.selected_difficulty,
                                            values=['Problem1', 'Problem2', 'Problem3', 'Easy', 'Medium', 'Hard', 'Custom'])
-        self.difficultyMenu.place(x=515, y=8)
+        self.difficultyMenu.place(x=530, y=8)
         self.difficultyMenu.current(0)
 
         # Solve button
         self.solveButton = Button(self.root, text='Solve', font=(
             'Fira Code', 15, 'bold'), bg='green', fg='black', relief=GROOVE, bd=5, command=self.solve)
-        self.solveButton.place(x=700, y=5)
+        self.solveButton.place(x=750, y=5)
         # Clear button
         self.clearButton = Button(self.root, text='Clear', font=(
             'Fira Code', 15, 'bold'), bg='green', fg='black', relief=GROOVE, bd=5, command=self.clear)
-        self.clearButton.place(x=800, y=5)
+        self.clearButton.place(x=850, y=5)
         # validate button
         self.validateButton = Button(self.root, text='Validate', font=(
             'Fira Code', 15, 'bold'), bg='green', fg='black', relief=GROOVE, bd=5, command=self.validate)
-        self.validateButton.place(x=900, y=5)
+        self.validateButton.place(x=950, y=5)
         # generate random button
         self.generateButton = Button(self.root, text='Generate Random', font=(
             'Fira Code', 15, 'bold'), bg='green', fg='black', relief=GROOVE, bd=5, command=self.generate_random)
-        self.generateButton.place(x=1000, y=5)
+        self.generateButton.place(x=1000, y=100)
+        # time counter
+        self.timeLabel = Label(self.root, text='Time', font=(
+            'Segoe UI', 15, 'italic'), bg='green', width=12, fg='black', relief=GROOVE, bd=5)
+        self.timeLabel.place(x=850, y=100)
+        self.time = StringVar()
+        self.time.set('0')
+        self.timeDisplay = Label(self.root, bg='gray', textvariable=self.time, font=(
+            'Segoe UI', 15))
+        self.timeDisplay.place(x=845, y=140)
 
     def validate(self):
         sudoku_grid = ''
@@ -123,6 +133,14 @@ class SudokuSolver:
                 f.write(sudoku_grid)
 
     def solve(self):
+        # Disable the Solve button to prevent multiple threads
+        self.solveButton.config(state=DISABLED)
+
+        # Start the solve process in a new thread
+        solve_thread = threading.Thread(target=self._solve)
+        solve_thread.start()
+
+    def _solve(self):
         array = []
         if self.selected_difficulty.get() == 'Custom':
             # Read the grid from the GUI
@@ -144,6 +162,7 @@ class SudokuSolver:
                 for line in ins:
                     array.append(line.strip())
             ins.close()
+        start_time = time.time()
         with open(f'output/{self.selected_difficulty.get()}_output.txt', 'w') as f:
             for grid in array:
                 solution = None
@@ -165,8 +184,9 @@ class SudokuSolver:
                         solution = sudoku.values
                 if solution is None:
                     f.write('No solution found for this problem\n')
-                    if  self.selected_difficulty.get() in ['Custom', 'Easy', 'Medium', 'Hard']:
-                        messagebox.showerror('No solution','No solution found for this problem')
+                    if self.selected_difficulty.get() in ['Custom', 'Easy', 'Medium', 'Hard']:
+                        messagebox.showerror(
+                            'No solution', 'No solution found for this problem')
                 else:
                     f.write(solver.write(solution) + '\n')
                 # Fill the grid in the GUI with the solution
@@ -174,12 +194,18 @@ class SudokuSolver:
                         for i in range(9):
                             for j in range(9):
                                 self.cells[i][j].delete(0, 'end')
-                                self.cells[i][j].insert(0, solution[f'{chr(65+i)}{j+1}'])
+                                self.cells[i][j].insert(
+                                    0, solution[f'{chr(65+i)}{j+1}'])
                                 self.cells[i][j].config(fg='green')
+        end_time = time.time()  # End the timer
+        elapsed_time = end_time - start_time
+        self.time.set(f'{elapsed_time:.3f} seconds')
+        # Re-enable the Solve button
+        self.solveButton.config(state=NORMAL)
 
     def generate_random(self):
         self.clear()
-        # Generate a complete Sudoku puzzle
+    # Generate a complete Sudoku puzzle
 
         def generate_complete_board():
             board = [['0'] * 9 for _ in range(9)]
@@ -231,9 +257,17 @@ class SudokuSolver:
             num_holes = 40
         elif difficulty == 'Hard':
             num_holes = 50
+        else:
+            num_holes = 40
 
         puzzle_board = create_puzzle(complete_board, num_holes)
         puzzle_grid = ''.join(''.join(row) for row in puzzle_board)
+
+        # Ensure the grid length is 81 characters
+        if len(puzzle_grid) != 81:
+            messagebox.showerror('Invalid Puzzle Generation',
+                                 'Generated puzzle is not 81 characters long.')
+            return
 
         # Save the generated puzzle to a file
         with open(f'input/{difficulty}.txt', 'w') as f:
@@ -247,6 +281,7 @@ class SudokuSolver:
                     self.cells[i][j].config(fg='red')
 
     def clear(self):
+        self.time.set('0 seconds')
         for i in range(9):
             for j in range(9):
                 self.cells[i][j].delete(0, 'end')
