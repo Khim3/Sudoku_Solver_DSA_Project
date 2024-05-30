@@ -151,19 +151,18 @@ class SudokuSolver:
                 if self.selected_algorithm.get() == 'Backtracking':
                     solver = BacktrackingSolver(sudoku)
                     solution = solver.Backtracking_Search(sudoku)
-                    f.write(solver.write(solution) + '\n')
+                 #   f.write(solver.write(solution) + '\n')
                 elif self.selected_algorithm.get() == 'AC-3':
                     solver = AC3Solver(sudoku)
                     solved = solver.AC3()
                     if solved and solver.isComplete():
                         solution = sudoku.values
-                        f.write(solver.write(solution) + '\n')
+                #        f.write(solver.write(solution) + '\n')
                 elif self.selected_algorithm.get() == 'Hidden Single':
                     solver = HiddenSingleSolver(sudoku)
                     solved = solver.Hidden_Single()
                     if solved:
                         solution = sudoku.values
-                        f.write(solver.write(solution) + '\n')
                 if solution is None:
                     f.write('No solution found for this problem\n')
                     if  self.selected_difficulty.get() in ['Custom', 'Easy', 'Medium', 'Hard']:
@@ -171,12 +170,12 @@ class SudokuSolver:
                 else:
                     f.write(solver.write(solution) + '\n')
                 # Fill the grid in the GUI with the solution
-                    for i in range(9):
-                        for j in range(9):
-                            self.cells[i][j].delete(0, 'end')
-                            self.cells[i][j].insert(
-                                0, solution[f'{chr(65+i)}{j+1}'])
-                            self.cells[i][j].config(fg='green')
+                    if self.selected_difficulty.get() in ['Custom', 'Easy', 'Medium', 'Hard']:
+                        for i in range(9):
+                            for j in range(9):
+                                self.cells[i][j].delete(0, 'end')
+                                self.cells[i][j].insert(0, solution[f'{chr(65+i)}{j+1}'])
+                                self.cells[i][j].config(fg='green')
 
     def generate_random(self):
         self.clear()
