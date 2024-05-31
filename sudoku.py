@@ -10,6 +10,7 @@ from HiddenSingle import *
 import time
 import random
 import threading
+from tkinter import Toplevel, Text, Scrollbar, VERTICAL, RIGHT, Y
 
 
 class SudokuSolver:
@@ -98,6 +99,56 @@ class SudokuSolver:
         self.timeDisplay = Label(self.root, bg='gray', textvariable=self.time, font=(
             'Segoe UI', 15))
         self.timeDisplay.place(x=845, y=140)
+        # open solution button
+        self.openButton = Button(self.root, text='Open Solution', font=(
+            'Fira Code', 15, 'bold'), bg='green', fg='black', relief=GROOVE, bd=5, command=self.open_solution)
+        self.openButton.place(x=1000, y=200)
+
+    def open_solution(self):
+        if self.selected_difficulty.get() in ['Problem1', 'Problem2', 'Problem3', 'Easy', 'Medium', 'Hard', 'Custom']:
+            try:
+                with open(f'output/{self.selected_difficulty.get()}_output.txt', 'r') as f:
+                    solution = f.read()
+                    # Split the solution into individual problems
+                    solution_problems = solution.strip().split('\n')
+
+                    # Format each problem with a bullet point and problem number
+                    formatted_solution = ''
+                    for i, line in enumerate(solution_problems):
+                        if line.strip():
+                            formatted_solution += f'Problem {i + 1}:\n• {line.strip()}\n\n'
+
+                    # Create a new Toplevel window
+                    solution_window = Toplevel(self.root)
+                    solution_window.title("Solution")
+                    solution_window.geometry("700x600")
+
+                    # Add a Text widget with a scrollbar
+                    text_widget = Text(solution_window, wrap='word')
+                    text_widget.insert('1.0', formatted_solution)
+
+                    # Configure the font size and style
+                    text_widget.tag_configure('font', font=('Fira Code', 10))
+                    text_widget.tag_add('font', '1.0', 'end')
+
+                    text_widget.config(state='disabled')
+
+                    scrollbar = Scrollbar(
+                        solution_window, orient=VERTICAL, command=text_widget.yview)
+                    text_widget.config(yscrollcommand=scrollbar.set)
+
+                    text_widget.pack(side='left', fill='both', expand=True)
+                    scrollbar.pack(side=RIGHT, fill=Y)
+
+                    # Make the window resizable
+                    solution_window.resizable(True, True)
+
+            except FileNotFoundError:
+                messagebox.showerror(
+                    'File Not Found', 'Solution file not found for this problem')
+        else:
+            messagebox.showerror(
+                'Invalid Selection', 'Please select a problem to view its solution')
 
     def validate(self):
         sudoku_grid = ''
@@ -114,9 +165,9 @@ class SudokuSolver:
                     break
             if invalid_input:
                 break
-        if invalid_input:
-            messagebox.showerror(
-                'Invalid Input', 'Please enter valid digits only.')
+        # if invalid_input:
+        #     messagebox.showerror(
+        #         'Invalid Input', 'Please enter valid digits only.')
         else:
             sudoku = csp(grid=sudoku_grid)
             # Check if any constraints are violated
@@ -258,16 +309,16 @@ class SudokuSolver:
         elif difficulty == 'Hard':
             num_holes = 50
         else:
-            num_holes = 40
+            num_holes = 30
 
         puzzle_board = create_puzzle(complete_board, num_holes)
         puzzle_grid = ''.join(''.join(row) for row in puzzle_board)
 
-        # Ensure the grid length is 81 characters
-        if len(puzzle_grid) != 81:
-            messagebox.showerror('Invalid Puzzle Generation',
-                                 'Generated puzzle is not 81 characters long.')
-            return
+        # # Ensure the grid length is 81 characters
+        # if len(puzzle_grid) != 81:
+        #     messagebox.showerror('Invalid Puzzle Generation',
+        #                          'Generated puzzle is not 81 characters long.')
+        #     return
 
         # Save the generated puzzle to a file
         with open(f'input/{difficulty}.txt', 'w') as f:
