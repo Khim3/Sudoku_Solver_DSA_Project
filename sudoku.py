@@ -257,7 +257,6 @@ class SudokuSolver:
         # Re-enable the Solve button
         self.solveButton.config(state=NORMAL)
     # Generate a random Sudoku puzzle
-
     def generate_random(self):
         self.clear()
 
