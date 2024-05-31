@@ -6,7 +6,6 @@ from random import randint
 from Backtrack import *
 from AC3 import *
 from csp import *
-from HiddenSingle import *
 import time
 import random
 import threading
@@ -23,6 +22,7 @@ class SudokuSolver:
         self.root.config(bg='gray')
         self.create_widgets()
 
+    # add singleton pattern
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
             cls._instance = super().__new__(cls)
@@ -33,6 +33,7 @@ class SudokuSolver:
         if not cls._instance:
             cls._instance = cls(root)
         return cls._instance
+    # validate the input of the user
 
     def create_widgets(self):
         def validate_input(P):
@@ -54,6 +55,8 @@ class SudokuSolver:
                 entry.grid(row=i, column=j)
                 row.append(entry)
             self.cells.append(row)
+
+        # add buttons for menu
         # Algorithm selection
         self.selected_algorithm = StringVar()
         self.algoLabel = Label(self.root, text='Algorithm: ', font=(
@@ -61,38 +64,38 @@ class SudokuSolver:
         self.algoLabel.place(x=1, y=5)
 
         self.algoMenu = ttk.Combobox(self.root, height=10, width=15, font=('Fira Code', 15, 'bold'), textvariable=self.selected_algorithm,
-                                     values=['Backtracking', 'AC-3', 'Hidden Single'])
+                                     values=['Backtracking', 'AC-3'])
         self.algoMenu.place(x=160, y=8)
         self.algoMenu.current(0)
         # Difficulty selection
         self.selected_difficulty = StringVar()
         self.difficultyLabel = Label(self.root, text='Difficulty: ', font=(
-            'Fira Code', 15, 'italic'), bg='green', width=12, fg='black', relief=GROOVE, bd=5)
+            'Fira Code', 15, 'italic',), justify='center', bg='green', width=12, fg='black', relief=GROOVE, bd=5)
         self.difficultyLabel.place(x=370, y=5)
-        self.difficultyMenu = ttk.Combobox(self.root, height=10, width=12, font=('Fira Code', 15, 'bold'), textvariable=self.selected_difficulty,
+        self.difficultyMenu = ttk.Combobox(self.root, height=10, width=12, font=('Fira Code', 15, 'bold'), justify='center', textvariable=self.selected_difficulty,
                                            values=['Problem1', 'Problem2', 'Problem3', 'Easy', 'Medium', 'Hard', 'Custom'])
         self.difficultyMenu.place(x=530, y=8)
         self.difficultyMenu.current(0)
 
         # Solve button
         self.solveButton = Button(self.root, text='Solve', font=(
-            'Fira Code', 15, 'bold'), bg='green', fg='black', relief=GROOVE, bd=5, command=self.solve)
+            'Fira Code', 15, 'bold'), justify='center', bg='green', fg='black', relief=GROOVE, bd=5, command=self.solve)
         self.solveButton.place(x=750, y=5)
         # Clear button
         self.clearButton = Button(self.root, text='Clear', font=(
-            'Fira Code', 15, 'bold'), bg='green', fg='black', relief=GROOVE, bd=5, command=self.clear)
+            'Fira Code', 15, 'bold'), justify='center', bg='green', fg='black', relief=GROOVE, bd=5, command=self.clear)
         self.clearButton.place(x=850, y=5)
         # validate button
         self.validateButton = Button(self.root, text='Validate', font=(
-            'Fira Code', 15, 'bold'), bg='green', fg='black', relief=GROOVE, bd=5, command=self.validate)
+            'Fira Code', 15, 'bold'), bg='green', justify='center', fg='black', relief=GROOVE, bd=5, command=self.validate)
         self.validateButton.place(x=950, y=5)
         # generate random button
         self.generateButton = Button(self.root, text='Generate Random', font=(
-            'Fira Code', 15, 'bold'), bg='green', fg='black', relief=GROOVE, bd=5, command=self.generate_random)
+            'Fira Code', 15, 'bold'), bg='green', justify='center', fg='black', relief=GROOVE, bd=5, command=self.generate_random)
         self.generateButton.place(x=1000, y=100)
         # time counter
         self.timeLabel = Label(self.root, text='Time', font=(
-            'Segoe UI', 15, 'italic'), bg='green', width=12, fg='black', relief=GROOVE, bd=5)
+            'Segoe UI', 15, 'italic'), bg='green', justify='center', width=12, fg='black', relief=GROOVE, bd=5)
         self.timeLabel.place(x=850, y=100)
         self.time = StringVar()
         self.time.set('0')
@@ -101,8 +104,9 @@ class SudokuSolver:
         self.timeDisplay.place(x=845, y=140)
         # open solution button
         self.openButton = Button(self.root, text='Open Solution', font=(
-            'Fira Code', 15, 'bold'), bg='green', fg='black', relief=GROOVE, bd=5, command=self.open_solution)
+            'Fira Code', 15, 'bold'), bg='green', justify='center', fg='black', relief=GROOVE, bd=5, command=self.open_solution)
         self.openButton.place(x=1000, y=200)
+    # Open the solution file for the selected problem
 
     def open_solution(self):
         if self.selected_difficulty.get() in ['Problem1', 'Problem2', 'Problem3', 'Easy', 'Medium', 'Hard', 'Custom']:
@@ -116,19 +120,19 @@ class SudokuSolver:
                     formatted_solution = ''
                     for i, line in enumerate(solution_problems):
                         if line.strip():
-                            formatted_solution += f'Problem {i + 1}:\n• {line.strip()}\n\n'
+                            formatted_solution += f'Problem {i + 1}: {line.strip()}\n'
 
                     # Create a new Toplevel window
                     solution_window = Toplevel(self.root)
                     solution_window.title("Solution")
-                    solution_window.geometry("700x600")
+                    solution_window.geometry("850x750")
 
                     # Add a Text widget with a scrollbar
                     text_widget = Text(solution_window, wrap='word')
                     text_widget.insert('1.0', formatted_solution)
 
                     # Configure the font size and style
-                    text_widget.tag_configure('font', font=('Fira Code', 10))
+                    text_widget.tag_configure('font', font=('Fira Code', 12))
                     text_widget.tag_add('font', '1.0', 'end')
 
                     text_widget.config(state='disabled')
@@ -165,9 +169,9 @@ class SudokuSolver:
                     break
             if invalid_input:
                 break
-        # if invalid_input:
-        #     messagebox.showerror(
-        #         'Invalid Input', 'Please enter valid digits only.')
+        if invalid_input:
+            messagebox.showerror(
+                'Invalid Input', 'Please enter valid digits only.')
         else:
             sudoku = csp(grid=sudoku_grid)
             # Check if any constraints are violated
@@ -182,6 +186,7 @@ class SudokuSolver:
             # If no constraints are violated, write the Sudoku grid string to a file
             with open('input/Custom.txt', 'w') as f:
                 f.write(sudoku_grid)
+    # Solve the Sudoku puzzle with multithreading
 
     def solve(self):
         # Disable the Solve button to prevent multiple threads
@@ -190,6 +195,7 @@ class SudokuSolver:
         # Start the solve process in a new thread
         solve_thread = threading.Thread(target=self._solve)
         solve_thread.start()
+    # Solve the Sudoku puzzle
 
     def _solve(self):
         array = []
@@ -228,11 +234,6 @@ class SudokuSolver:
                     if solved and solver.isComplete():
                         solution = sudoku.values
                 #        f.write(solver.write(solution) + '\n')
-                elif self.selected_algorithm.get() == 'Hidden Single':
-                    solver = HiddenSingleSolver(sudoku)
-                    solved = solver.Hidden_Single()
-                    if solved:
-                        solution = sudoku.values
                 if solution is None:
                     f.write('No solution found for this problem\n')
                     if self.selected_difficulty.get() in ['Custom', 'Easy', 'Medium', 'Hard']:
@@ -245,50 +246,59 @@ class SudokuSolver:
                         for i in range(9):
                             for j in range(9):
                                 self.cells[i][j].delete(0, 'end')
-                                self.cells[i][j].insert(
-                                    0, solution[f'{chr(65+i)}{j+1}'])
-                                self.cells[i][j].config(fg='green')
+                                self.cells[i][j].insert(0, solution[f'{chr(65+i)}{j+1}'])
+                                if (i, j) in self.initial_cells:
+                                    self.cells[i][j].config(fg='blue')
+                                else:
+                                    self.cells[i][j].config(fg='green')
         end_time = time.time()  # End the timer
         elapsed_time = end_time - start_time
         self.time.set(f'{elapsed_time:.3f} seconds')
         # Re-enable the Solve button
         self.solveButton.config(state=NORMAL)
+    # Generate a random Sudoku puzzle
 
     def generate_random(self):
         self.clear()
-    # Generate a complete Sudoku puzzle
 
-        def generate_complete_board():
+        # Create a partially filled board
+        def create_initial_board():
             board = [['0'] * 9 for _ in range(9)]
-
-            def is_valid(board, row, col, num):
-                for i in range(9):
-                    if board[row][i] == num or board[i][col] == num:
-                        return False
-                start_row, start_col = 3 * (row // 3), 3 * (col // 3)
-                for i in range(start_row, start_row + 3):
-                    for j in range(start_col, start_col + 3):
-                        if board[i][j] == num:
-                            return False
-                return True
-
-            def solve_board(board):
-                for row in range(9):
-                    for col in range(9):
-                        if board[row][col] == '0':
-                            nums = [str(n) for n in range(1, 10)]
-                            random.shuffle(nums)
-                            for num in nums:
-                                if is_valid(board, row, col, num):
-                                    board[row][col] = num
-                                    if solve_board(board):
-                                        return True
-                                    board[row][col] = '0'
-                            return False
-                return True
-
-            solve_board(board)
+            # Fill some cells with random numbers to create a partially filled board
+            for _ in range(17):  # Fill 17 random cells, can adjust this number
+                row, col = random.randint(0, 8), random.randint(0, 8)
+                num = str(random.randint(1, 9))
+                while not is_valid(board, row, col, num):
+                    num = str(random.randint(1, 9))
+                board[row][col] = num
             return board
+
+        # Check if a number can be placed in the board without breaking the rules
+        def is_valid(board, row, col, num):
+            for i in range(9):
+                if board[row][i] == num or board[i][col] == num:
+                    return False
+            start_row, start_col = 3 * (row // 3), 3 * (col // 3)
+            for i in range(start_row, start_row + 3):
+                for j in range(start_col, start_col + 3):
+                    if board[i][j] == num:
+                        return False
+            return True
+
+        # Convert the board to a grid string
+        def board_to_grid(board):
+            return ''.join(''.join(row) for row in board)
+
+        # Use your existing solver to solve the board
+        def solve_initial_board(board):
+            grid = board_to_grid(board)
+            sudoku = csp(grid=grid)
+            solver = BacktrackingSolver(sudoku)  # or the algorithm of your choice
+            solution = solver.Backtracking_Search(sudoku)
+            if solution:
+                solved_board = [[solution[f'{chr(65 + i)}{j + 1}'] for j in range(9)] for i in range(9)]
+                return solved_board
+            return None
 
         # Remove digits to create the puzzle
         def create_puzzle(board, num_holes):
@@ -300,7 +310,13 @@ class SudokuSolver:
                     board[row][col] = '0'
             return board
 
-        complete_board = generate_complete_board()
+        initial_board = create_initial_board()
+        solved_board = solve_initial_board(initial_board)
+
+        if not solved_board:
+            messagebox.showerror('Error', 'Failed to generate a valid Sudoku puzzle.')
+            return
+
         difficulty = self.selected_difficulty.get()
         if difficulty == 'Easy':
             num_holes = 30
@@ -309,28 +325,31 @@ class SudokuSolver:
         elif difficulty == 'Hard':
             num_holes = 50
         else:
-            num_holes = 30
+            num_holes = 40
 
-        puzzle_board = create_puzzle(complete_board, num_holes)
-        puzzle_grid = ''.join(''.join(row) for row in puzzle_board)
+        puzzle_board = create_puzzle(solved_board, num_holes)
+        puzzle_grid = board_to_grid(puzzle_board)
 
-        # # Ensure the grid length is 81 characters
-        # if len(puzzle_grid) != 81:
-        #     messagebox.showerror('Invalid Puzzle Generation',
-        #                          'Generated puzzle is not 81 characters long.')
-        #     return
+        # Ensure the grid length is 81 characters
+        if len(puzzle_grid) != 81:
+            messagebox.showerror('Invalid Puzzle Generation', 'Generated puzzle is not 81 characters long.')
+            return
 
         # Save the generated puzzle to a file
         with open(f'input/{difficulty}.txt', 'w') as f:
             f.write(puzzle_grid)
 
         # Display the puzzle in the GUI
+        self.initial_cells = set()
         for i in range(9):
             for j in range(9):
                 if puzzle_board[i][j] != '0':
                     self.cells[i][j].insert(0, puzzle_board[i][j])
-                    self.cells[i][j].config(fg='red')
+                    self.cells[i][j].config(fg='blue')
+                    self.initial_cells.add((i, j))
 
+
+    # Clear the Sudoku grid
     def clear(self):
         self.time.set('0 seconds')
         for i in range(9):

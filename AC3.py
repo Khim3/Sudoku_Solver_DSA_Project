@@ -1,8 +1,7 @@
 from csp import *
 from copy import deepcopy
-import util
+import util 
 import queue
-
 
 
 class AC3Solver:
@@ -26,7 +25,7 @@ class AC3Solver:
     def Revise(self, Xi, Xj):
         revised = False
         values = set(self.csp.values[Xi])
-        for x in values: 
+        for x in values:
             if not self.isConsistent(x, Xi, Xj):
                 self.csp.values[Xi] = self.csp.values[Xi].replace(x, '')
                 revised = True
@@ -34,26 +33,15 @@ class AC3Solver:
 
     def isConsistent(self, x, Xi, Xj):
         for y in self.csp.values[Xj]:
-            if Xj in self.csp.peers[Xi] and y!=x:
+            if Xj in self.csp.peers[Xi] and y != x:
                 return True
         return False
 
     def isComplete(self):
         for variable in squares:
-            if len(self.csp.values[variable])>1:
+            if len(self.csp.values[variable]) > 1:
                 return False
         return True
-
-    def display(self, values):
-        for row in rows:
-            if row in 'DG':
-                print("-------------------------------------------")
-            for col in cols:
-                if col in '47':
-                    print(' | ', values[row + col], ' ', end=' ')
-                else:
-                    print(values[row + col], ' ', end=' ')
-            print(end='\n')
 
     def write(self, values):
         output = ""

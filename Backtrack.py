@@ -68,17 +68,6 @@ class BacktrackingSolver:
                 return False
         return True
 
-    # def display(self, values):
-    #     for row in rows:
-    #         if row in 'DG':
-    #             print("-------------------------------------------")
-    #         for col in cols:
-    #             if col in '47':
-    #                 print(' | ', values[row + col], ' ', end=' ')
-    #             else:
-    #                 print(values[row + col], ' ', end=' ')
-    #         print(end='\n')
-
     def write(self, values):
         output = ""
         for variable in squares:
