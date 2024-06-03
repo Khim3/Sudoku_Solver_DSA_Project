@@ -98,7 +98,7 @@ class SudokuSolver:
             'Segoe UI', 15, 'italic'), bg='green', justify='center', width=12, fg='black', relief=GROOVE, bd=5)
         self.timeLabel.place(x=850, y=100)
         self.time = StringVar()
-        self.time.set('0')
+        self.time.set('0 seconds')
         self.timeDisplay = Label(self.root, bg='gray', textvariable=self.time, font=(
             'Segoe UI', 15))
         self.timeDisplay.place(x=845, y=140)
@@ -111,7 +111,7 @@ class SudokuSolver:
     def open_solution(self):
         if self.selected_difficulty.get() in ['Problem1', 'Problem2', 'Problem3', 'Easy', 'Medium', 'Hard', 'Custom']:
             try:
-                with open(f'output/{self.selected_difficulty.get()}_output.txt', 'r') as f:
+                with open(f'Sudoku Solver/output/{self.selected_difficulty.get()}_output.txt', 'r') as f:
                     solution = f.read()
                     # Split the solution into individual problems
                     solution_problems = solution.strip().split('\n')
@@ -184,7 +184,9 @@ class SudokuSolver:
                                 "Invalid Input", "The Sudoku grid violates some constraints.")
                             return
             # If no constraints are violated, write the Sudoku grid string to a file
-            with open('input/Custom.txt', 'w') as f:
+            messagebox.showinfo(
+                                "Valid Input", "The Sudoku grid violates no constraints.")
+            with open('Sudoku Solver/input/Custom.txt', 'w') as f:
                 f.write(sudoku_grid)
     # Solve the Sudoku puzzle with multithreading
 
@@ -202,6 +204,7 @@ class SudokuSolver:
         if self.selected_difficulty.get() == 'Custom':
             # Read the grid from the GUI
             grid = ''
+            self.initial_cells = set()
             for i in range(9):
                 for j in range(9):
                     cell_value = self.cells[i][j].get()
@@ -209,18 +212,20 @@ class SudokuSolver:
                         grid += '0'
                     elif cell_value.isdigit():
                         grid += cell_value
+                        self.cells[i][j].config(fg='blue')
+                        self.initial_cells.add((i, j))
                     else:
                         messagebox.showerror(
                             'Invalid Input', 'Please enter valid digits only.')
                         return
             array.append(grid)
         if self.selected_difficulty.get() in ['Problem1', 'Problem2', 'Problem3', 'Easy', 'Medium', 'Hard']:
-            with open(f'input/{self.selected_difficulty.get()}.txt', 'r') as ins:
+            with open(f'Sudoku Solver/input/{self.selected_difficulty.get()}.txt', 'r') as ins:
                 for line in ins:
                     array.append(line.strip())
             ins.close()
         start_time = time.time()
-        with open(f'output/{self.selected_difficulty.get()}_output.txt', 'w') as f:
+        with open(f'Sudoku Solver/output/{self.selected_difficulty.get()}_output.txt', 'w') as f:
             for grid in array:
                 solution = None
                 sudoku = csp(grid=grid)
@@ -242,7 +247,7 @@ class SudokuSolver:
                 else:
                     f.write(solver.write(solution) + '\n')
                 # Fill the grid in the GUI with the solution
-                    if self.selected_difficulty.get() in ['Custom', 'Easy', 'Medium', 'Hard']:
+                    if self.selected_difficulty.get() in ['Custom','Easy', 'Medium', 'Hard']:
                         for i in range(9):
                             for j in range(9):
                                 self.cells[i][j].delete(0, 'end')
@@ -264,7 +269,7 @@ class SudokuSolver:
         def create_initial_board():
             board = [['0'] * 9 for _ in range(9)]
             # Fill some cells with random numbers to create a partially filled board
-            for _ in range(17):  # Fill 17 random cells, can adjust this number
+            for _ in range(17): 
                 row, col = random.randint(0, 8), random.randint(0, 8)
                 num = str(random.randint(1, 9))
                 while not is_valid(board, row, col, num):
@@ -335,7 +340,7 @@ class SudokuSolver:
             return
 
         # Save the generated puzzle to a file
-        with open(f'input/{difficulty}.txt', 'w') as f:
+        with open(f'Sudoku Solver/input/{difficulty}.txt', 'w') as f:
             f.write(puzzle_grid)
 
         # Display the puzzle in the GUI
