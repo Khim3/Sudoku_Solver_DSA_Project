@@ -20,7 +20,7 @@ This is a Sudoku Solver implemented as part of a Data Structures and Algorithms 
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/your-username/sudoku-solver.git](https://github.com/Khim3/Sudoku_Solver_DSA_Project.git
+    git clone [https://github.com/Khim3/Sudoku_Solver_DSA_Project.git]
     ```
 
 2. Install the required Python libraries:
@@ -53,7 +53,7 @@ This is a Sudoku Solver implemented as part of a Data Structures and Algorithms 
 - `input/`: Directory containing input Sudoku puzzles.
 - `output/`: Directory where solutions are saved.
 
-## Example
+## Instructions
 
 1. Open the GUI by running `sudoku.py`.
 2. Select a predefined puzzle, create random puzzle or enter a custom puzzle.
