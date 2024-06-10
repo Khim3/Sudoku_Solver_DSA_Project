@@ -1,3 +1,5 @@
+# Name: Nguyen Nhat Khiem - ITDSIU21091
+# Purpose: Implement a Sudoku Solver using Backtracking and AC-3 algorithms
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import *

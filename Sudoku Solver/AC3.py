@@ -1,3 +1,5 @@
+# Name: Nguyen Nhat Khiem - ITDSIU21091
+# Purpose: Implementing the AC3Solver class for the Sudoku Solver
 from csp import *
 from copy import deepcopy
 import queue

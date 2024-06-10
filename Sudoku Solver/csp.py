@@ -1,3 +1,5 @@
+# Name: Nguyen Nhat Khiem - ITDSIU21091
+# Purpose: Implementing the CSP class for the Sudoku Solver
 from util import *
 
 

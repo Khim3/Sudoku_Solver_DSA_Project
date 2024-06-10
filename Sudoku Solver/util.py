@@ -1,3 +1,5 @@
+# Name: Nguyen Nhat Khiem - ITDSIU21091
+# Purpose: Implementing the util class for the Sudoku Solver
 import inspect
 import sys
 
@@ -15,5 +17,6 @@ def raiseNotDefined():
 def cross(A, B):
 
     return [a + b for a in A for b in B]
+
 
 squares = cross(rows, cols)
