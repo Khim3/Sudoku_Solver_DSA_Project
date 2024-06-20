@@ -20,7 +20,7 @@ class SudokuSolver:
     def __init__(self, root):
         self.root = root
         self.root.title('Sudoku Solver')
-        self.root.geometry('1280x720')
+        self.root.geometry('1280x600')
         self.root.config(bg='gray')
         self.create_widgets()
 
@@ -187,7 +187,7 @@ class SudokuSolver:
                             return
             # If no constraints are violated, write the Sudoku grid string to a file
             messagebox.showinfo(
-                                "Valid Input", "The Sudoku grid violates no constraints.")
+                "Valid Input", "The Sudoku grid violates no constraints.")
             with open('Sudoku Solver/input/Custom.txt', 'w') as f:
                 f.write(sudoku_grid)
     # Solve the Sudoku puzzle with multithreading
@@ -249,11 +249,12 @@ class SudokuSolver:
                 else:
                     f.write(solver.write(solution) + '\n')
                 # Fill the grid in the GUI with the solution
-                    if self.selected_difficulty.get() in ['Custom','Easy', 'Medium', 'Hard']:
+                    if self.selected_difficulty.get() in ['Custom', 'Easy', 'Medium', 'Hard']:
                         for i in range(9):
                             for j in range(9):
                                 self.cells[i][j].delete(0, 'end')
-                                self.cells[i][j].insert(0, solution[f'{chr(65+i)}{j+1}'])
+                                self.cells[i][j].insert(
+                                    0, solution[f'{chr(65+i)}{j+1}'])
                                 if (i, j) in self.initial_cells:
                                     self.cells[i][j].config(fg='blue')
                                 else:
@@ -264,6 +265,7 @@ class SudokuSolver:
         # Re-enable the Solve button
         self.solveButton.config(state=NORMAL)
     # Generate a random Sudoku puzzle
+
     def generate_random(self):
         self.clear()
 
@@ -271,7 +273,7 @@ class SudokuSolver:
         def create_initial_board():
             board = [['0'] * 9 for _ in range(9)]
             # Fill some cells with random numbers to create a partially filled board
-            for _ in range(17): 
+            for _ in range(17):
                 row, col = random.randint(0, 8), random.randint(0, 8)
                 num = str(random.randint(1, 9))
                 while not is_valid(board, row, col, num):
@@ -299,10 +301,12 @@ class SudokuSolver:
         def solve_initial_board(board):
             grid = board_to_grid(board)
             sudoku = csp(grid=grid)
-            solver = BacktrackingSolver(sudoku)  # or the algorithm of your choice
+            # or the algorithm of your choice
+            solver = BacktrackingSolver(sudoku)
             solution = solver.Backtracking_Search(sudoku)
             if solution:
-                solved_board = [[solution[f'{chr(65 + i)}{j + 1}'] for j in range(9)] for i in range(9)]
+                solved_board = [
+                    [solution[f'{chr(65 + i)}{j + 1}'] for j in range(9)] for i in range(9)]
                 return solved_board
             return None
 
@@ -320,7 +324,8 @@ class SudokuSolver:
         solved_board = solve_initial_board(initial_board)
 
         if not solved_board:
-            messagebox.showerror('Error', 'Failed to generate a valid Sudoku puzzle.')
+            messagebox.showerror(
+                'Error', 'Failed to generate a valid Sudoku puzzle.')
             return
 
         difficulty = self.selected_difficulty.get()
@@ -338,7 +343,8 @@ class SudokuSolver:
 
         # Ensure the grid length is 81 characters
         if len(puzzle_grid) != 81:
-            messagebox.showerror('Invalid Puzzle Generation', 'Generated puzzle is not 81 characters long.')
+            messagebox.showerror('Invalid Puzzle Generation',
+                                 'Generated puzzle is not 81 characters long.')
             return
 
         # Save the generated puzzle to a file
@@ -354,8 +360,8 @@ class SudokuSolver:
                     self.cells[i][j].config(fg='blue')
                     self.initial_cells.add((i, j))
 
-
     # Clear the Sudoku grid
+
     def clear(self):
         self.time.set('0 seconds')
         for i in range(9):
